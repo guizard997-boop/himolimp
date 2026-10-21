@@ -1,0 +1,56 @@
+{
+  "name": "ХимОлимп — Подготовка к олимпиаде по химии",
+  "short_name": "ХимОлимп",
+  "description": "Обучающий симулятор химических реакций. Все 118 элементов, сотни реакций, квиз и подготовка к олимпиаде по химии.",
+  "start_url": "./index.html",
+  "id": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#05080f",
+  "theme_color": "#0a0e17",
+  "lang": "ru",
+  "dir": "ltr",
+  "categories": ["education", "games"],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Реактор",
+      "short_name": "Реактор",
+      "url": "./index.html",
+      "description": "Открыть реактор синтеза"
+    }
+  ],
+  "prefer_related_applications": false
+}
