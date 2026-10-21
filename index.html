@@ -242,6 +242,103 @@
     .ach.done { border-color: var(--success); color: var(--success); }
     .ach .ico { font-size: 1.3rem; margin-bottom: 4px; }
 
+
+    /* Bottom nav */
+    .bottom-nav {
+      flex-shrink: 0; display: flex; background: var(--panel);
+      border-top: 1px solid rgba(0,240,255,.2); padding: 6px 4px max(6px, env(safe-area-inset-bottom));
+      z-index: 20;
+    }
+    .nav-btn {
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
+      background: none; border: none; color: var(--muted); font-size: .65rem; padding: 6px 2px;
+      cursor: pointer; border-radius: 10px; transition: color .2s, background .2s;
+    }
+    .nav-btn .ico { font-size: 1.25rem; }
+    .nav-btn.active { color: var(--accent); background: rgba(0,240,255,.08); }
+
+    /* Views */
+    .view { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+    .view.active { display: flex; }
+
+    /* Encyclopedia swipe */
+    .ency-wrap { flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 0 0 8px; }
+    .ency-card {
+      flex: 1; margin: 8px 12px; background: var(--panel); border-radius: 20px;
+      border: 1px solid rgba(0,240,255,.2); overflow: hidden; display: flex; flex-direction: column;
+      animation: cardIn .35s ease;
+    }
+    @keyframes cardIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: none; } }
+    .ency-visual {
+      height: 160px; position: relative; display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(ellipse at center, rgba(0,240,255,.12), transparent 70%);
+      overflow: hidden;
+    }
+    .ency-visual.phase-gas .particles span {
+      position: absolute; border-radius: 50%; background: var(--el-color, #88f);
+      opacity: .5; animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%,100% { transform: translate(0,0) scale(1); }
+      50% { transform: translate(10px,-15px) scale(1.1); }
+    }
+    .ency-visual.phase-liquid .liquid-surface {
+      position: absolute; bottom: 20%; left: 15%; right: 15%; height: 40%;
+      border-radius: 40% 40% 20% 20%; background: linear-gradient(180deg, rgba(255,255,255,.3), var(--el-color, #aaa));
+      opacity: .85; animation: wave 2s ease-in-out infinite;
+      box-shadow: 0 0 30px var(--el-color, #aaa);
+    }
+    @keyframes wave { 0%,100%{ transform: scaleX(1); } 50%{ transform: scaleX(1.05) translateY(-3px); } }
+    .ency-visual.phase-solid .metal-block {
+      width: 90px; height: 70px; border-radius: 12px;
+      background: linear-gradient(145deg, #fff8, var(--el-color, #888), #0006);
+      box-shadow: 0 8px 24px #0008, inset 0 1px 0 #fff4;
+      animation: shine 3s ease-in-out infinite;
+    }
+    @keyframes shine { 0%,100%{ filter: brightness(1); } 50%{ filter: brightness(1.15); } }
+    .ency-visual .big-sym-vis {
+      font-size: 3.5rem; font-weight: 800; color: var(--el-color, #0ff);
+      text-shadow: 0 0 30px var(--el-color, #0ff); z-index: 2; position: relative;
+    }
+    .ency-body { flex: 1; overflow-y: auto; padding: 14px 16px 20px; -webkit-overflow-scrolling: touch; }
+    .ency-name { font-size: 1.4rem; font-weight: 700; }
+    .ency-meta { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 12px; }
+    .ency-section { margin-bottom: 12px; }
+    .ency-section h4 {
+      font-size: .7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent);
+      margin-bottom: 4px;
+    }
+    .ency-section p { font-size: .82rem; color: var(--text); line-height: 1.45; }
+    .ency-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 16px; gap: 10px;
+    }
+    .ency-nav button {
+      width: 48px; height: 48px; border-radius: 14px; border: 1px solid rgba(0,240,255,.3);
+      background: rgba(0,240,255,.1); color: var(--accent); font-size: 1.4rem; cursor: pointer;
+    }
+    .ency-nav button:active { transform: scale(.92); }
+    .ency-pos { font-size: .8rem; color: var(--muted); }
+
+    /* Synth animation overlay */
+    .synth-fx {
+      pointer-events: none; position: fixed; inset: 0; z-index: 50; display: none;
+      align-items: center; justify-content: center;
+    }
+    .synth-fx.on { display: flex; }
+    .synth-fx .burst {
+      width: 120px; height: 120px; border-radius: 50%;
+      border: 3px solid var(--accent); animation: burst 0.7s ease-out forwards;
+      box-shadow: 0 0 40px var(--accent);
+    }
+    @keyframes burst {
+      0% { transform: scale(.2); opacity: 1; }
+      100% { transform: scale(2.5); opacity: 0; }
+    }
+
+    /* main without double flex issues when views */
+    main.has-views { padding-bottom: 0; }
+
   </style>
 </head>
 <body>
@@ -296,6 +393,27 @@
       <div class="elements-grid" id="elementsGrid"></div>
     </section>
   </main>
+
+  
+  <div class="view" id="viewEncy" style="display:none;position:fixed;top:56px;left:0;right:0;bottom:56px;flex-direction:column;background:var(--bg);z-index:5;">
+    <div class="ency-wrap">
+      <div class="ency-card" id="encyCard"></div>
+      <div class="ency-nav">
+        <button type="button" id="encyPrev">‹</button>
+        <span class="ency-pos" id="encyPos">1 / 118</span>
+        <button type="button" id="encyNext">›</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="synth-fx" id="synthFx"><div class="burst"></div></div>
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="nav-btn active" data-view="reactor"><span class="ico">⚡</span>Реактор</button>
+    <button class="nav-btn" data-view="ency"><span class="ico">📖</span>Энциклопедия</button>
+    <button class="nav-btn" data-view="journal"><span class="ico">📔</span>Журнал</button>
+    <button class="nav-btn" data-view="quiz"><span class="ico">🏆</span>Квиз</button>
+  </nav>
+
 
   <!-- Journal -->
   <div class="modal" id="journalModal">
@@ -1239,6 +1357,112 @@
       if (discoveries.some(d => d.formula === "NaCl")) unlockAch("salt");
       if (discoveries.some(d => d.formula && d.formula.includes("Xe"))) unlockAch("noble");
     };
+
+
+    // ========== ENCYCLOPEDIA + APPEARANCE ==========
+    const APPEAR = {"1": {"phase": "gas", "look": "Бесцветный невидимый газ", "real": "В обычной жизни его не видно. Это самый лёгкий газ: шарики с водородом взлетают (опасно — горюч). Жидкий водород прозрачен и очень холоден (−253 °C).", "color": "#ffffff"}, "2": {"phase": "gas", "look": "Бесцветный газ", "real": "Невидим. Наполняет праздничные шары (не горит, в отличие от водорода). В голосе после гелия становится писклявым.", "color": "#d9ffff"}, "3": {"phase": "solid", "look": "Мягкий серебристый металл", "real": "Режется ножом, блестит как свежий свинец, на воздухе за минуты темнеет. Кусочек хранят в масле, иначе окислится.", "color": "#cc80ff"}, "4": {"phase": "solid", "look": "Серебристо-серый металл", "real": "Металлический блеск, сравнительно лёгкий. На воздухе тускнеет.", "color": "#c2ff00"}, "5": {"phase": "solid", "look": "Серый полуметалл", "real": "Внешне часто как тёмный металл, но хрупкий. Проводит ток хуже металлов.", "color": "#ffb5b5"}, "6": {"phase": "solid", "look": "Чёрный графит или прозрачный алмаз", "real": "Карандашный грифель — графит (скользкий, чёрный). Алмаз в кольце — тот же элемент, но другая кристаллическая решётка.", "color": "#909090"}, "7": {"phase": "gas", "look": "Невидимый газ (78% воздуха)", "real": "Вы постоянно им дышите. Жидкий азот — бурлящая прозрачная «вода», от которой идёт туман (конденсат воздуха).", "color": "#3050f8"}, "8": {"phase": "gas", "look": "Невидимый газ", "real": "Не виден, но без него нет огня и дыхания. Жидкий кислород — нежно-голубая жидкость.", "color": "#ff0d0d"}, "9": {"phase": "gas", "look": "Бледно-жёлтый едкий газ", "real": "Слабый желтоватый оттенок, очень агрессивен. В чистом виде в быту не встречается.", "color": "#90e050"}, "10": {"phase": "gas", "look": "Бесцветный инертный газ", "real": "Невидим и почти не с чем не реагирует. В лампах и рекламных трубках даёт цветное свечение.", "color": "#b3e3f5"}, "11": {"phase": "solid", "look": "Мягкий блестящий металл", "real": "Как твёрдый сыр по мягкости, серебристый срез, на воздухе белеет/тускнеет за секунды. В воде шипит и плавает.", "color": "#ab5cf2"}, "12": {"phase": "solid", "look": "Серебристо-серый металл", "real": "Металлический блеск, сравнительно лёгкий. На воздухе тускнеет.", "color": "#8aff00"}, "13": {"phase": "solid", "look": "Металл или хрупкое вещество", "real": "От мягких блестящих (свинец, олово) до более хрупких серых форм.", "color": "#bfa6a6"}, "14": {"phase": "solid", "look": "Серый полуметалл", "real": "Внешне часто как тёмный металл, но хрупкий. Проводит ток хуже металлов.", "color": "#f0c8a0"}, "15": {"phase": "solid", "look": "Белый восковой или красный порошок", "real": "Белый фосфор мягкий, ядовит, светится зелёным в темноте. Красный — безопаснее, тёмно-красный порошок на спичках.", "color": "#ff8000"}, "16": {"phase": "solid", "look": "Ярко-жёлтые кристаллы", "real": "Лимонно-жёлтый порошок или хрупкие кристаллы — так сера выглядит у вулканов и в лаборатории.", "color": "#ffff30"}, "17": {"phase": "gas", "look": "Жёлто-зелёный тяжёлый газ", "real": "Цвет как у разбавленной зелёнки или «хлорной» воды. Резкий запах бассейна/отбеливателя.", "color": "#1ff01f"}, "18": {"phase": "gas", "look": "Бесцветный инертный газ", "real": "Невидим и почти не с чем не реагирует. В лампах и рекламных трубках даёт цветное свечение.", "color": "#80d1e3"}, "19": {"phase": "solid", "look": "Мягкий серебристый металл", "real": "Мягкий, блестящий на срезе, на воздухе быстро покрывается плёнкой. С водой реагирует бурно.", "color": "#8f40d4"}, "20": {"phase": "solid", "look": "Серебристо-серый металл", "real": "Металлический блеск, сравнительно лёгкий. На воздухе тускнеет.", "color": "#3dff00"}, "21": {"phase": "solid", "look": "Металл с характерным блеском", "real": "Большинство — серые твёрдые металлы. Исключения по цвету: медь, золото.", "color": "#88aacc"}, "22": {"phase": "solid", "look": "Металл с характерным блеском", "real": "Большинство — серые твёрдые металлы. Исключения по цвету: медь, золото.", "color": "#88aacc"}, "23": {"phase": "solid", "look": "Металл с характерным блеском", "real": "Большинство — серые твёрдые металлы. Исключения по цвету: медь, золото.", "color": "#88aacc"}, "24": {"phase": "solid", "look": "Металл с характерным блеском", "real": "Большинство — серые твёрдые металлы. Исключения по цвету: медь, золото.", "color": "#88aacc"}, "25": {"phase": "solid", "look": "Металл с характерным блеском", "real": "Большинство — серые твёрдые металлы. Исключения по цвету: медь, золото.", "color": "#88aacc"}, "26": {"phase": "solid", "look": "Серый магнитный металл", "real": "Обычное железо и сталь. Ржавчина — рыжая рыхлая корка. Чистый металл — серебристо-серый.", "color": "#e06633"}, "27": {"phase": "solid", "look": "Металл с характерным блеском", "real": "Большинство — серые твёрдые металлы. Исключения по цвету: медь, золото.", "color": "#88aacc"}, "28": {"phase": "solid", "look": "Металл с характерным блеском", "real": "Большинство — серые твёрдые металлы. Исключения по цвету: медь, золото.", "color": "#88aacc"}, "29": {"phase": "solid", "look": "Красновато-золотистый металл", "real": "Узнаваемый цвет медной трубы и монет: розово-красный блеск. Со временем зеленеет (патина).", "color": "#c88033"}, "30": {"phase": "solid", "look": "Металл с характерным блеском", "real": "Большинство — серые твёрдые металлы. Исключения по цвету: медь, золото.", "color": "#88aacc"}, "31": {"phase": "solid", "look": "Металл или хрупкое вещество", "real": "От мягких блестящих (свинец, олово) до более хрупких серых форм.", "color": "#88aacc"}, "32": {"phase": "solid", "look": "Серый полуметалл", "real": "Внешне часто как тёмный металл, но хрупкий. Проводит ток хуже металлов.", "color": "#88aacc"}, "33": {"phase": "solid", "look": "Серый полуметалл", "real": "Внешне часто как тёмный металл, но хрупкий. Проводит ток хуже металлов.", "color": "#88aacc"}, "34": {"phase": "solid", "look": "Неметалл", "real": "Внешний вид сильно различается: газы, жёлтая сера, чёрный углерод, цветные кристаллы.", "color": "#88aacc"}, "35": {"phase": "liquid", "look": "Красно-бурая дымящая жидкость", "real": "Тяжёлая жидкость цвета крепкого чая/крови, над ней красно-бурые ядовитые пары. Единственный жидкий неметалл.", "color": "#a62929"}, "36": {"phase": "gas", "look": "Бесцветный инертный газ", "real": "Невидим и почти не с чем не реагирует. В лампах и рекламных трубках даёт цветное свечение.", "color": "#88aacc"}, "37": {"phase": "solid", "look": "Мягкий серебристый металл", "real": "Мягкий, блестящий на срезе, на воздухе быстро покрывается плёнкой. С водой реагирует бурно.", "color": "#88aacc"}, "38": {"phase": "solid", "look": "Серебристо-серый металл", "real": "Металлический блеск, сравнительно лёгкий. На воздухе тускнеет.", "color": "#88aacc"}, "39": {"phase": "solid", "look": "Металл с характерным блеском", "real": "Большинство — серые твёрдые металлы. Исключения по цвету: медь, золото.", "color": "#88aacc"}, "40": {"phase": "solid", "look": "Металл с характерным блеском", "real": "Большинство — серые твёрдые металлы. Исключения по цвету: медь, золото.", "color": "#88aacc"}, "41": {"phase": "solid", "look": "Металл с характерным блеском", "real": "Большинство — серые твёрдые металлы. Исключения по цвету: медь, золото.", "color": "#88aacc"}, "42": {"phase": "solid", "look": "Металл с характерным блеском", "real": "Большинство — серые твёрдые металлы. Исключения по цвету: медь, золото.", "color": "#88aacc"}, "43": {"phase": "solid", "look": "Металл с характерным блеском", "real": "Большинство — серые твёрдые металлы. Исключения по цвету: медь, золото.", "color": "#88aacc"}, "44": {"phase": "solid", "look": "Металл с характерным блеском", "real": "Большинство — серые твёрдые металлы. Исключения по цвету: медь, золото.", "color": "#88aacc"}, "45": {"phase": "solid", "look": "Металл с характерным блеском", "real": "Большинство — серые твёрдые металлы. Исключения по цвету: медь, золото.", "color": "#88aacc"}, "46": {"phase": "solid", "look": "Металл с характерным блеском", "real": "Большинство — серые твёрдые металлы. Исключения по цвету: медь, золото.", "color": "#88aacc"}, "47": {"phase": "solid", "look": "Ослепительно белый блеск", "real": "Самый «белый» металл в быту: ложки, украшения. Со временем чернеет от серы в воздухе.", "color": "#c0c0c0"}, "48": {"phase": "solid", "look": "Металл с характерным блеском", "real": "Большинство — серые твёрдые металлы. Исключения по цвету: медь, золото.", "color": "#88aacc"}, "49": {"phase": "solid", "look": "Металл или хрупкое вещество", "real": "От мягких блестящих (свинец, олово) до более хрупких серых форм.", "color": "#88aacc"}, "50": {"phase": "solid", "look": "Металл или хрупкое вещество", "real": "От мягких блестящих (свинец, олово) до более хрупких серых форм.", "color": "#88aacc"}, "51": {"phase": "solid", "look": "Серый полуметалл", "real": "Внешне часто как тёмный металл, но хрупкий. Проводит ток хуже металлов.", "color": "#88aacc"}, "52": {"phase": "solid", "look": "Серый полуметалл", "real": "Внешне часто как тёмный металл, но хрупкий. Проводит ток хуже металлов.", "color": "#88aacc"}, "53": {"phase": "solid", "look": "Почти чёрные кристаллы с фиолетовым", "real": "Блестящие тёмные пластинки; если нагреть — фиолетовый пар, как в школьном опыте.", "color": "#940094"}, "54": {"phase": "gas", "look": "Бесцветный инертный газ", "real": "Невидим и почти не с чем не реагирует. В лампах и рекламных трубках даёт цветное свечение.", "color": "#88aacc"}, "55": {"phase": "solid", "look": "Мягкий серебристый металл", "real": "Мягкий, блестящий на срезе, на воздухе быстро покрывается плёнкой. С водой реагирует бурно.", "color": "#88aacc"}, "56": {"phase": "solid", "look": "Серебристо-серый металл", "real": "Металлический блеск, сравнительно лёгкий. На воздухе тускнеет.", "color": "#88aacc"}, "57": {"phase": "solid", "look": "Серебристый редкоземельный металл", "real": "Мягкие серебристые металлы, на воздухе окисляются. На вид почти неотличимы друг от друга.", "color": "#88aacc"}, "58": {"phase": "solid", "look": "Серебристый редкоземельный металл", "real": "Мягкие серебристые металлы, на воздухе окисляются. На вид почти неотличимы друг от друга.", "color": "#88aacc"}, "59": {"phase": "solid", "look": "Серебристый редкоземельный металл", "real": "Мягкие серебристые металлы, на воздухе окисляются. На вид почти неотличимы друг от друга.", "color": "#88aacc"}, "60": {"phase": "solid", "look": "Серебристый редкоземельный металл", "real": "Мягкие серебристые металлы, на воздухе окисляются. На вид почти неотличимы друг от друга.", "color": "#88aacc"}, "61": {"phase": "solid", "look": "Серебристый редкоземельный металл", "real": "Мягкие серебристые металлы, на воздухе окисляются. На вид почти неотличимы друг от друга.", "color": "#88aacc"}, "62": {"phase": "solid", "look": "Серебристый редкоземельный металл", "real": "Мягкие серебристые металлы, на воздухе окисляются. На вид почти неотличимы друг от друга.", "color": "#88aacc"}, "63": {"phase": "solid", "look": "Серебристый редкоземельный металл", "real": "Мягкие серебристые металлы, на воздухе окисляются. На вид почти неотличимы друг от друга.", "color": "#88aacc"}, "64": {"phase": "solid", "look": "Серебристый редкоземельный металл", "real": "Мягкие серебристые металлы, на воздухе окисляются. На вид почти неотличимы друг от друга.", "color": "#88aacc"}, "65": {"phase": "solid", "look": "Серебристый редкоземельный металл", "real": "Мягкие серебристые металлы, на воздухе окисляются. На вид почти неотличимы друг от друга.", "color": "#88aacc"}, "66": {"phase": "solid", "look": "Серебристый редкоземельный металл", "real": "Мягкие серебристые металлы, на воздухе окисляются. На вид почти неотличимы друг от друга.", "color": "#88aacc"}, "67": {"phase": "solid", "look": "Серебристый редкоземельный металл", "real": "Мягкие серебристые металлы, на воздухе окисляются. На вид почти неотличимы друг от друга.", "color": "#88aacc"}, "68": {"phase": "solid", "look": "Серебристый редкоземельный металл", "real": "Мягкие серебристые металлы, на воздухе окисляются. На вид почти неотличимы друг от друга.", "color": "#88aacc"}, "69": {"phase": "solid", "look": "Серебристый редкоземельный металл", "real": "Мягкие серебристые металлы, на воздухе окисляются. На вид почти неотличимы друг от друга.", "color": "#88aacc"}, "70": {"phase": "solid", "look": "Серебристый редкоземельный металл", "real": "Мягкие серебристые металлы, на воздухе окисляются. На вид почти неотличимы друг от друга.", "color": "#88aacc"}, "71": {"phase": "solid", "look": "Серебристый редкоземельный металл", "real": "Мягкие серебристые металлы, на воздухе окисляются. На вид почти неотличимы друг от друга.", "color": "#88aacc"}, "72": {"phase": "solid", "look": "Металл с характерным блеском", "real": "Большинство — серые твёрдые металлы. Исключения по цвету: медь, золото.", "color": "#88aacc"}, "73": {"phase": "solid", "look": "Металл с характерным блеском", "real": "Большинство — серые твёрдые металлы. Исключения по цвету: медь, золото.", "color": "#88aacc"}, "74": {"phase": "solid", "look": "Металл с характерным блеском", "real": "Большинство — серые твёрдые металлы. Исключения по цвету: медь, золото.", "color": "#88aacc"}, "75": {"phase": "solid", "look": "Металл с характерным блеском", "real": "Большинство — серые твёрдые металлы. Исключения по цвету: медь, золото.", "color": "#88aacc"}, "76": {"phase": "solid", "look": "Металл с характерным блеском", "real": "Большинство — серые твёрдые металлы. Исключения по цвету: медь, золото.", "color": "#88aacc"}, "77": {"phase": "solid", "look": "Металл с характерным блеском", "real": "Большинство — серые твёрдые металлы. Исключения по цвету: медь, золото.", "color": "#88aacc"}, "78": {"phase": "solid", "look": "Металл с характерным блеском", "real": "Большинство — серые твёрдые металлы. Исключения по цвету: медь, золото.", "color": "#88aacc"}, "79": {"phase": "solid", "look": "Яркий жёлтый металл", "real": "Классическое «золото»: тёплый жёлтый блеск, не ржавеет, не темнеет.", "color": "#ffd123"}, "80": {"phase": "liquid", "look": "Серебристые подвижные капли", "real": "Как жидкое зеркало: тяжёлые блестящие шарики ртути. Токсична — не трогать.", "color": "#b8b8b8"}, "81": {"phase": "solid", "look": "Металл или хрупкое вещество", "real": "От мягких блестящих (свинец, олово) до более хрупких серых форм.", "color": "#88aacc"}, "82": {"phase": "solid", "look": "Металл или хрупкое вещество", "real": "От мягких блестящих (свинец, олово) до более хрупких серых форм.", "color": "#88aacc"}, "83": {"phase": "solid", "look": "Металл или хрупкое вещество", "real": "От мягких блестящих (свинец, олово) до более хрупких серых форм.", "color": "#88aacc"}, "84": {"phase": "solid", "look": "Металл или хрупкое вещество", "real": "От мягких блестящих (свинец, олово) до более хрупких серых форм.", "color": "#88aacc"}, "85": {"phase": "solid", "look": "Тёмные кристаллы", "real": "Тяжёлые галогены — тёмные блестящие или матовые кристаллы, летучие.", "color": "#88aacc"}, "86": {"phase": "gas", "look": "Бесцветный инертный газ", "real": "Невидим и почти не с чем не реагирует. В лампах и рекламных трубках даёт цветное свечение.", "color": "#88aacc"}, "87": {"phase": "solid", "look": "Мягкий серебристый металл", "real": "Мягкий, блестящий на срезе, на воздухе быстро покрывается плёнкой. С водой реагирует бурно.", "color": "#88aacc"}, "88": {"phase": "solid", "look": "Серебристо-серый металл", "real": "Металлический блеск, сравнительно лёгкий. На воздухе тускнеет.", "color": "#88aacc"}, "89": {"phase": "solid", "look": "Радиоактивный серебристый металл", "real": "Если образец достаточно большой — серый металл. Многие получены в микроскопических количествах.", "color": "#88aacc"}, "90": {"phase": "solid", "look": "Радиоактивный серебристый металл", "real": "Если образец достаточно большой — серый металл. Многие получены в микроскопических количествах.", "color": "#88aacc"}, "91": {"phase": "solid", "look": "Радиоактивный серебристый металл", "real": "Если образец достаточно большой — серый металл. Многие получены в микроскопических количествах.", "color": "#88aacc"}, "92": {"phase": "solid", "look": "Тяжёлый серый металл", "real": "Плотный серебристо-серый. В природе скрыт в чёрной смоляной руде. Радиоактивен.", "color": "#008fff"}, "93": {"phase": "solid", "look": "Радиоактивный серебристый металл", "real": "Если образец достаточно большой — серый металл. Многие получены в микроскопических количествах.", "color": "#88aacc"}, "94": {"phase": "solid", "look": "Радиоактивный серебристый металл", "real": "Если образец достаточно большой — серый металл. Многие получены в микроскопических количествах.", "color": "#88aacc"}, "95": {"phase": "solid", "look": "Радиоактивный серебристый металл", "real": "Если образец достаточно большой — серый металл. Многие получены в микроскопических количествах.", "color": "#88aacc"}, "96": {"phase": "solid", "look": "Радиоактивный серебристый металл", "real": "Если образец достаточно большой — серый металл. Многие получены в микроскопических количествах.", "color": "#88aacc"}, "97": {"phase": "solid", "look": "Радиоактивный серебристый металл", "real": "Если образец достаточно большой — серый металл. Многие получены в микроскопических количествах.", "color": "#88aacc"}, "98": {"phase": "solid", "look": "Радиоактивный серебристый металл", "real": "Если образец достаточно большой — серый металл. Многие получены в микроскопических количествах.", "color": "#88aacc"}, "99": {"phase": "solid", "look": "Радиоактивный серебристый металл", "real": "Если образец достаточно большой — серый металл. Многие получены в микроскопических количествах.", "color": "#88aacc"}, "100": {"phase": "solid", "look": "Радиоактивный серебристый металл", "real": "Если образец достаточно большой — серый металл. Многие получены в микроскопических количествах.", "color": "#88aacc"}, "101": {"phase": "solid", "look": "Радиоактивный серебристый металл", "real": "Если образец достаточно большой — серый металл. Многие получены в микроскопических количествах.", "color": "#88aacc"}, "102": {"phase": "solid", "look": "Радиоактивный серебристый металл", "real": "Если образец достаточно большой — серый металл. Многие получены в микроскопических количествах.", "color": "#88aacc"}, "103": {"phase": "solid", "look": "Радиоактивный серебристый металл", "real": "Если образец достаточно большой — серый металл. Многие получены в микроскопических количествах.", "color": "#88aacc"}, "104": {"phase": "solid", "look": "Металл с характерным блеском", "real": "Большинство — серые твёрдые металлы. Исключения по цвету: медь, золото.", "color": "#88aacc"}, "105": {"phase": "solid", "look": "Металл с характерным блеском", "real": "Большинство — серые твёрдые металлы. Исключения по цвету: медь, золото.", "color": "#88aacc"}, "106": {"phase": "solid", "look": "Металл с характерным блеском", "real": "Большинство — серые твёрдые металлы. Исключения по цвету: медь, золото.", "color": "#88aacc"}, "107": {"phase": "solid", "look": "Металл с характерным блеском", "real": "Большинство — серые твёрдые металлы. Исключения по цвету: медь, золото.", "color": "#88aacc"}, "108": {"phase": "solid", "look": "Металл с характерным блеском", "real": "Большинство — серые твёрдые металлы. Исключения по цвету: медь, золото.", "color": "#88aacc"}, "109": {"phase": "unknown", "look": "Образец практически недоступен", "real": "Сверхтяжёлый элемент: синтезированы единичные атомы, «посмотреть глазами» нельзя.", "color": "#666680"}, "110": {"phase": "unknown", "look": "Образец практически недоступен", "real": "Сверхтяжёлый элемент: синтезированы единичные атомы, «посмотреть глазами» нельзя.", "color": "#666680"}, "111": {"phase": "unknown", "look": "Образец практически недоступен", "real": "Сверхтяжёлый элемент: синтезированы единичные атомы, «посмотреть глазами» нельзя.", "color": "#666680"}, "112": {"phase": "solid", "look": "Металл с характерным блеском", "real": "Большинство — серые твёрдые металлы. Исключения по цвету: медь, золото.", "color": "#88aacc"}, "113": {"phase": "unknown", "look": "Образец практически недоступен", "real": "Сверхтяжёлый элемент: синтезированы единичные атомы, «посмотреть глазами» нельзя.", "color": "#666680"}, "114": {"phase": "unknown", "look": "Образец практически недоступен", "real": "Сверхтяжёлый элемент: синтезированы единичные атомы, «посмотреть глазами» нельзя.", "color": "#666680"}, "115": {"phase": "unknown", "look": "Образец практически недоступен", "real": "Сверхтяжёлый элемент: синтезированы единичные атомы, «посмотреть глазами» нельзя.", "color": "#666680"}, "116": {"phase": "unknown", "look": "Образец практически недоступен", "real": "Сверхтяжёлый элемент: синтезированы единичные атомы, «посмотреть глазами» нельзя.", "color": "#666680"}, "117": {"phase": "unknown", "look": "Образец практически недоступен", "real": "Сверхтяжёлый элемент: синтезированы единичные атомы, «посмотреть глазами» нельзя.", "color": "#666680"}, "118": {"phase": "gas", "look": "Бесцветный инертный газ", "real": "Невидим и почти не с чем не реагирует. В лампах и рекламных трубках даёт цветное свечение.", "color": "#88aacc"}};
+    let encyIdx = 0;
+
+    function phaseLabel(p) {
+      return {gas:"Газ",liquid:"Жидкость",solid:"Твёрдое",unknown:"Неизвестно"}[p] || p;
+    }
+
+    function renderEncy(i) {
+      encyIdx = (i + ELEMENTS.length) % ELEMENTS.length;
+      const el = ELEMENTS[encyIdx];
+      const a = APPEAR[String(el.z)] || {phase:"solid",look:"—",real:"—",color:"#88aacc"};
+      const card = document.getElementById("encyCard");
+      let visual = "";
+      if (a.phase === "gas") {
+        visual = `<div class="ency-visual phase-gas" style="--el-color:${a.color}"><div class="particles">`;
+        for (let k=0;k<12;k++) {
+          const sz = 6+Math.random()*14;
+          visual += `<span style="width:${sz}px;height:${sz}px;left:${10+Math.random()*80}%;top:${10+Math.random()*70}%;animation-delay:${Math.random()*2}s;background:${a.color}"></span>`;
+        }
+        visual += `</div><div class="big-sym-vis">${el.s}</div></div>`;
+      } else if (a.phase === "liquid") {
+        visual = `<div class="ency-visual phase-liquid" style="--el-color:${a.color}"><div class="liquid-surface"></div><div class="big-sym-vis">${el.s}</div></div>`;
+      } else {
+        visual = `<div class="ency-visual phase-solid" style="--el-color:${a.color}"><div class="metal-block"></div><div class="big-sym-vis" style="position:absolute">${el.s}</div></div>`;
+      }
+      card.innerHTML = visual + `
+        <div class="ency-body">
+          <div class="ency-name">${el.n}</div>
+          <div class="ency-meta">
+            <span class="tag">Z = ${el.z}</span>
+            <span class="tag type">${phaseLabel(a.phase)}</span>
+            <span class="tag bond">${el.c}</span>
+          </div>
+          <div class="ency-section"><h4>Как выглядит</h4><p>${a.look}</p></div>
+          <div class="ency-section"><h4>В реальности</h4><p>${a.real}</p></div>
+          <div class="ency-section"><h4>Заметка</h4><p>${el.edu||""}</p></div>
+          <div class="ency-section"><h4>Валентность (типичная)</h4><p>${el.val ?? "—"}</p></div>
+          <button class="btn btn-primary" style="width:100%;margin-top:8px" id="encyAddBtn">＋ В реактор</button>
+        </div>`;
+      document.getElementById("encyPos").textContent = `${el.z} / 118 · ${el.s}`;
+      const addBtn = document.getElementById("encyAddBtn");
+      if (addBtn) addBtn.onclick = () => { addToReactor(el); showToast(el.s + " добавлен в реактор"); switchView("reactor"); };
+      // swipe on card
+      let sx=0;
+      card.ontouchstart = e => { sx = e.changedTouches[0].screenX; };
+      card.ontouchend = e => {
+        const dx = e.changedTouches[0].screenX - sx;
+        if (dx < -50) renderEncy(encyIdx+1);
+        if (dx > 50) renderEncy(encyIdx-1);
+      };
+    }
+
+    function switchView(name) {
+      document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.dataset.view===name));
+      const ency = document.getElementById("viewEncy");
+      const main = document.querySelector("main");
+      if (name === "ency") {
+        ency.style.display = "flex";
+        if (main) main.style.visibility = "hidden";
+        renderEncy(encyIdx);
+      } else {
+        ency.style.display = "none";
+        if (main) main.style.visibility = "visible";
+        if (name === "journal") { renderJournal(); document.getElementById("journalModal").classList.add("open"); }
+        if (name === "quiz") startQuiz();
+      }
+    }
+
+    document.getElementById("bottomNav").addEventListener("click", e => {
+      const btn = e.target.closest(".nav-btn");
+      if (!btn) return;
+      switchView(btn.dataset.view);
+    });
+    document.getElementById("encyPrev").onclick = () => renderEncy(encyIdx-1);
+    document.getElementById("encyNext").onclick = () => renderEncy(encyIdx+1);
+
+    // Enhance showElementInfo with appearance
+    const _showEl = showElementInfo;
+    showElementInfo = function(el) {
+      const a = APPEAR[String(el.z)] || {};
+      encyIdx = el.z - 1;
+      _showEl(el);
+      const detail = document.getElementById("elDetail");
+      if (detail && a.real) {
+        detail.insertAdjacentHTML("beforeend", `
+          <div style="text-align:left;margin-top:12px;padding:10px;background:rgba(0,0,0,.25);border-radius:10px">
+            <div style="font-size:.65rem;color:var(--accent);text-transform:uppercase;margin-bottom:4px">В реальности</div>
+            <div style="font-size:.8rem;line-height:1.4">${a.look||""}</div>
+            <div style="font-size:.78rem;color:var(--muted);margin-top:6px;line-height:1.4">${a.real||""}</div>
+          </div>
+          <button class="btn btn-secondary" style="width:100%;margin-top:10px" onclick="document.getElementById('infoModal').classList.remove('open');switchView('ency')">📖 Открыть в энциклопедии</button>
+        `);
+      }
+    };
+
+    // Synth animation
+    const _synthesize = synthesize;
+    synthesize = function() {
+      const fx = document.getElementById("synthFx");
+      if (fx) { fx.classList.add("on"); setTimeout(() => fx.classList.remove("on"), 700); }
+      _synthesize();
+    };
+    btnSynth.onclick = synthesize;
 
     // Init
     renderElements();
