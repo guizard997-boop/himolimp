@@ -1,8 +1,8 @@
 {
-  "name": "himolimp",
+  "name": "chemix",
   "version": "1.0.0",
   "private": true,
-  "description": "ХимОлимп — подготовка к олимпиаде по химии",
+  "description": "Chemix — химический симулятор",
   "scripts": {
     "build:mobile": "node scripts/build-mobile.mjs",
     "cap:add": "cap add android",

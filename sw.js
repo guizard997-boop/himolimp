@@ -1,4 +1,4 @@
-const CACHE = 'himolimp-v4';
+const CACHE = 'chemix-v3';
 const ASSETS = [
   './',
   './index.html',

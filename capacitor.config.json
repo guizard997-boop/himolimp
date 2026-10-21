@@ -1,6 +1,6 @@
 {
-  "appId": "ru.himolimp.app",
-  "appName": "ХимОлимп",
+  "appId": "app.chemix.game",
+  "appName": "Chemix",
   "webDir": "www",
   "server": {
     "androidScheme": "https"

@@ -1,14 +1,14 @@
 {
-  "name": "ХимОлимп — Подготовка к олимпиаде по химии",
-  "short_name": "ХимОлимп",
-  "description": "Обучающий симулятор химических реакций. Все 118 элементов, сотни реакций, квиз и подготовка к олимпиаде по химии.",
+  "name": "Chemix — химический симулятор",
+  "short_name": "Chemix",
+  "description": "Смешивай элементы и соединения, открывай реальные реакции. 118 элементов, энциклопедия, квиз.",
   "start_url": "./index.html",
   "id": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#05080f",
-  "theme_color": "#0a0e17",
+  "background_color": "#0c0e16",
+  "theme_color": "#0c0e16",
   "lang": "ru",
   "dir": "ltr",
   "categories": ["education", "games"],
@@ -36,12 +36,6 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
-    },
-    {
-      "src": "icons/icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
     }
   ],
   "shortcuts": [
