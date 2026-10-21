@@ -1,0 +1,72 @@
+name: Extract himolimp zip
+
+on:
+  push:
+    paths:
+      - '.github/workflows/unzip.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  unzip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download zip from Google Drive
+        run: |
+          URL="https://drive.usercontent.google.com/download?id=1Udk13sbBmVEhpJzUvY5iohRG6ZfRnD_L&export=download&confirm=t"
+          ok=0
+          for i in $(seq 1 40); do
+            rm -f /tmp/himolimp.zip
+            if curl -fsSL --retry 3 -o /tmp/himolimp.zip "$URL"; then
+              if unzip -t /tmp/himolimp.zip > /dev/null 2>&1; then
+                ok=1
+                echo "Download OK on attempt $i"
+                break
+              fi
+            fi
+            echo "Attempt $i failed, retrying in 15s..."
+            sleep 15
+          done
+          if [ "$ok" -ne 1 ]; then
+            echo "ERROR: could not download a valid zip. Make sure the Drive file is shared with 'Anyone with the link'."
+            exit 1
+          fi
+
+      - name: Extract to repo root
+        run: |
+          mkdir -p /tmp/x
+          unzip -q /tmp/himolimp.zip -d /tmp/x
+          # если всё внутри одной корневой папки — поднимаем содержимое на уровень выше
+          shopt -s nullglob dotglob
+          entries=(/tmp/x/*)
+          if [ ${#entries[@]} -eq 1 ] && [ -d "${entries[0]}" ]; then
+            inner=(${entries[0]}/*)
+            for f in "${inner[@]}"; do
+              mv "$f" /tmp/x/
+            done
+            rmdir "${entries[0]}" || true
+          fi
+          for f in /tmp/x/*; do
+            b="$(basename "$f")"
+            rm -rf "./$b"
+            cp -r "$f" "./$b"
+          done
+          echo "Extracted files:"
+          find . -path ./.git -prune -o -type f -print | head -50
+
+      - name: Commit and remove workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/unzip.yml
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nothing to commit"
+          else
+            git commit -m "Extract himolimp-full.zip from Google Drive"
+            git push
+          fi
