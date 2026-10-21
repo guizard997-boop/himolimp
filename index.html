@@ -339,6 +339,20 @@
     /* main without double flex issues when views */
     main.has-views { padding-bottom: 0; }
 
+
+    .ency-photo {
+      width: 100%; height: 180px; object-fit: contain; background: #000;
+      display: block;
+    }
+    .ency-photo-wrap {
+      position: relative; background: #0a0a12; min-height: 160px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ency-photo-credit {
+      position: absolute; bottom: 4px; right: 8px; font-size: .55rem;
+      color: rgba(255,255,255,.45);
+    }
+
   </style>
 </head>
 <body>
@@ -1372,19 +1386,18 @@
       const el = ELEMENTS[encyIdx];
       const a = APPEAR[String(el.z)] || {phase:"solid",look:"—",real:"—",color:"#88aacc"};
       const card = document.getElementById("encyCard");
+      const photoSrc = "photos/" + String(el.z).padStart(3,"0") + ".jpg";
       let visual = "";
-      if (a.phase === "gas") {
-        visual = `<div class="ency-visual phase-gas" style="--el-color:${a.color}"><div class="particles">`;
-        for (let k=0;k<12;k++) {
-          const sz = 6+Math.random()*14;
-          visual += `<span style="width:${sz}px;height:${sz}px;left:${10+Math.random()*80}%;top:${10+Math.random()*70}%;animation-delay:${Math.random()*2}s;background:${a.color}"></span>`;
-        }
-        visual += `</div><div class="big-sym-vis">${el.s}</div></div>`;
-      } else if (a.phase === "liquid") {
-        visual = `<div class="ency-visual phase-liquid" style="--el-color:${a.color}"><div class="liquid-surface"></div><div class="big-sym-vis">${el.s}</div></div>`;
-      } else {
-        visual = `<div class="ency-visual phase-solid" style="--el-color:${a.color}"><div class="metal-block"></div><div class="big-sym-vis" style="position:absolute">${el.s}</div></div>`;
-      }
+      // Prefer real photo when available (offline files in photos/)
+      visual = `<div class="ency-photo-wrap">
+        <img class="ency-photo" src="${photoSrc}" alt="${el.n}"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+          style="display:block"/>
+        <div class="ency-visual phase-${a.phase||'solid'}" style="--el-color:${a.color};display:none;width:100%;height:160px">
+          <div class="big-sym-vis">${el.s}</div>
+        </div>
+        <span class="ency-photo-credit">images-of-elements.com · CC BY</span>
+      </div>`;
       card.innerHTML = visual + `
         <div class="ency-body">
           <div class="ency-name">${el.n}</div>

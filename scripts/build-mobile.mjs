@@ -30,6 +30,11 @@ const iconsDir = join(root, "icons");
 if (existsSync(iconsDir)) {
   cpSync(iconsDir, join(www, "icons"), { recursive: true });
 }
+const photosDir = join(root, "photos");
+if (existsSync(photosDir)) {
+  cpSync(photosDir, join(www, "photos"), { recursive: true });
+  console.log("photos copied");
+}
 
 // Capacitor loads from file/https scheme — ensure relative paths stay relative
 const indexPath = join(www, "index.html");
